@@ -1,0 +1,36 @@
+<x-app-layout>
+    <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <div class="grid gap-6 lg:grid-cols-[1fr_320px]">
+            <div class="panel overflow-hidden">
+                @if($catalogue->cover_image)
+                    <img src="{{ asset('storage/'.$catalogue->cover_image) }}" alt="{{ $catalogue->title }}" class="max-h-[420px] w-full object-cover">
+                @endif
+                <div class="p-6">
+                    <h1 class="text-3xl font-bold text-slate-950">{{ $catalogue->title }}</h1>
+                    <p class="mt-3 text-slate-600">{{ $catalogue->description }}</p>
+                    @if($catalogue->file_path)
+                        <a href="{{ asset('storage/'.$catalogue->file_path) }}" target="_blank" class="btn-secondary mt-5">Open uploaded file</a>
+                    @endif
+                </div>
+            </div>
+            <form method="POST" action="{{ route('admin.catalogues.update', $catalogue) }}" class="panel h-fit space-y-4 p-5">
+                @csrf
+                @method('PUT')
+                <h2 class="text-lg font-bold">Review decision</h2>
+                <div>
+                    <label class="label">Status</label>
+                    <select name="status" class="field mt-1">
+                        @foreach(['draft', 'pending_review', 'published', 'rejected', 'expired', 'archived'] as $status)
+                            <option value="{{ $status }}" @selected($catalogue->status === $status)>{{ str_replace('_', ' ', ucfirst($status)) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="label">Review notes</label>
+                    <textarea name="review_notes" rows="5" class="field mt-1">{{ old('review_notes', $catalogue->review_notes) }}</textarea>
+                </div>
+                <button class="btn-primary">Save decision</button>
+            </form>
+        </div>
+    </div>
+</x-app-layout>
