@@ -39,6 +39,8 @@
             <main>
                 {{ $slot }}
             </main>
+
+            @include('partials.newsletter-popup')
         </div>
     </body>
 </html>

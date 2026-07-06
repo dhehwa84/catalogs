@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\Admin\CatalogueModerationController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\NewsletterSubscriberController as AdminNewsletterSubscriberController;
 use App\Http\Controllers\Admin\ShopController as AdminShopController;
 use App\Http\Controllers\CatalogueBrowseController;
 use App\Http\Controllers\CatalogueShowController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NewsletterSubscriptionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Shop\BranchController;
 use App\Http\Controllers\Shop\CatalogueController;
@@ -20,6 +22,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/catalogues', [CatalogueBrowseController::class, 'index'])->name('catalogues.index');
 Route::get('/catalogues/{shop:slug}/{catalogue:slug}', [CatalogueShowController::class, 'show'])->name('catalogues.show');
 Route::get('/shops/{shop:slug}', [ShopShowController::class, 'show'])->name('shops.show');
+Route::post('/newsletter-subscriptions', [NewsletterSubscriptionController::class, 'store'])->name('newsletter-subscriptions.store');
 
 Route::get('/dashboard', function () {
     $user = auth()->user();
@@ -51,6 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::resource('/shops', AdminShopController::class)->only(['index', 'show'])->names('shops');
+        Route::get('/newsletter-subscribers', [AdminNewsletterSubscriberController::class, 'index'])->name('newsletter-subscribers.index');
         Route::post('/shops/{shop}/approve', [AdminShopController::class, 'approve'])->name('shops.approve');
         Route::post('/shops/{shop}/reject', [AdminShopController::class, 'reject'])->name('shops.reject');
         Route::post('/shops/{shop}/suspend', [AdminShopController::class, 'suspend'])->name('shops.suspend');

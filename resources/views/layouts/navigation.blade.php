@@ -16,6 +16,7 @@
                         <a href="{{ route('shop.dashboard') }}" class="nav-item {{ request()->routeIs('shop.*') ? 'nav-item-active' : '' }}">Shop portal</a>
                         @if(auth()->user()->isSuperAdmin())
                             <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.*') ? 'nav-item-active' : '' }}">Admin</a>
+                            <a href="{{ route('admin.newsletter-subscribers.index') }}" class="nav-item {{ request()->routeIs('admin.newsletter-subscribers.*') ? 'nav-item-active' : '' }}">Subscribers</a>
                         @endif
                     @endauth
                 </div>
@@ -51,6 +52,7 @@
                 <a href="{{ route('shop.dashboard') }}" class="mobile-nav-item">Shop portal</a>
                 @if(auth()->user()->isSuperAdmin())
                     <a href="{{ route('admin.dashboard') }}" class="mobile-nav-item">Admin</a>
+                    <a href="{{ route('admin.newsletter-subscribers.index') }}" class="mobile-nav-item">Subscribers</a>
                 @endif
                 <a href="{{ route('profile.edit') }}" class="mobile-nav-item">Profile</a>
                 <form method="POST" action="{{ route('logout') }}">
