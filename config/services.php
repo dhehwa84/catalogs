@@ -22,6 +22,15 @@ return [
         'key' => env('RESEND_API_KEY'),
     ],
 
+    'brevo' => [
+        'key' => env('BREVO_API_KEY', env('API_KEY')),
+        'endpoint' => env('BREVO_TRANSACTIONAL_EMAIL_ENDPOINT', 'https://api.brevo.com/v3/smtp/email'),
+        'sender' => [
+            'address' => env('BREVO_FROM_ADDRESS', env('MAIL_FROM_ADDRESS', 'hello@example.com')),
+            'name' => env('BREVO_FROM_NAME', env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel'))),
+        ],
+    ],
+
     'ses' => [
         'key' => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),

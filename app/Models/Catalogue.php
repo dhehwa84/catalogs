@@ -12,6 +12,7 @@ class Catalogue extends Model
         'valid_from' => 'date',
         'valid_to' => 'date',
         'published_at' => 'datetime',
+        'subscribers_notified_at' => 'datetime',
         'expired_at' => 'datetime',
         'is_featured' => 'boolean',
     ];

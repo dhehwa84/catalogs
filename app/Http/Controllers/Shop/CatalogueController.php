@@ -7,12 +7,17 @@ use App\Models\Catalogue;
 use App\Models\CatalogueCategory;
 use App\Models\Shop;
 use App\Models\Suburb;
+use App\Services\CatalogueSubscriberNotifier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class CatalogueController extends Controller
 {
+    public function __construct(protected CatalogueSubscriberNotifier $subscriberNotifier)
+    {
+    }
+
     public function index(Request $request)
     {
         $shop = $this->resolveShop($request);
@@ -64,9 +69,14 @@ class CatalogueController extends Controller
         $data['status'] = $data['status'] ?? 'draft';
         $data['is_featured'] = $request->boolean('is_featured');
 
+        if ($data['status'] === 'published') {
+            $data['published_at'] = now();
+        }
+
         $catalogue = $shop->catalogues()->create($data);
         $catalogue->branches()->sync($branchIds);
         $catalogue->areas()->sync($areaIds);
+        $this->subscriberNotifier->notifyIfNeeded($catalogue);
 
         return redirect()->route('shop.catalogues.index')->with('status', 'Catalogue created.');
     }
@@ -115,8 +125,13 @@ class CatalogueController extends Controller
         $areaIds = $data['area_ids'] ?? [];
         unset($data['branch_ids'], $data['area_ids'], $data['cover_image'], $data['catalogue_file']);
 
+        $wasPublished = $catalogue->status === 'published';
         $data['slug'] = $this->uniqueSlug($catalogue->shop, $data['title'], $catalogue);
         $data['is_featured'] = $request->boolean('is_featured');
+
+        if (($data['status'] ?? $catalogue->status) === 'published' && ! $catalogue->published_at) {
+            $data['published_at'] = now();
+        }
 
         if ($request->hasFile('cover_image')) {
             if ($catalogue->cover_image) {
@@ -139,6 +154,10 @@ class CatalogueController extends Controller
         $catalogue->branches()->sync($branchIds);
         $catalogue->areas()->sync($areaIds);
 
+        if (! $wasPublished && $catalogue->status === 'published') {
+            $this->subscriberNotifier->notifyIfNeeded($catalogue);
+        }
+
         return redirect()->route('shop.catalogues.index')->with('status', 'Catalogue updated.');
     }
 
@@ -154,6 +173,7 @@ class CatalogueController extends Controller
     {
         abort_unless($catalogue->shop_id === $this->resolveShop($request)->id, 404);
         $catalogue->update(['status' => 'published', 'published_at' => now()]);
+        $this->subscriberNotifier->notifyIfNeeded($catalogue);
 
         return back()->with('status', 'Catalogue published.');
     }
